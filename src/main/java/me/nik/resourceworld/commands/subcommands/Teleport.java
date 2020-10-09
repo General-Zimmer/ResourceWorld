@@ -237,6 +237,9 @@ public class Teleport extends SubCommand {
 
         if (args.length == 2) {
             List<String> worlds = new ArrayList<>();
+            if (WorldUtils.worldExists()) {
+                worlds.add("overworld");
+            }
             if (WorldUtils.netherExists()) {
                 worlds.add("nether");
             }
