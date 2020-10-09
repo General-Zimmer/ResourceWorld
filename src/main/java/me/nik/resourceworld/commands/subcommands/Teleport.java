@@ -60,7 +60,7 @@ public class Teleport extends SubCommand {
 
     @Override
     public String getSyntax() {
-        return "/resource tp <nether, end>";
+        return "/resource tp <nether, end, overworld>";
     }
 
     @Override
