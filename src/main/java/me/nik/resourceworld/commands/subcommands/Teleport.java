@@ -85,41 +85,27 @@ public class Teleport extends SubCommand {
                 }
                 World worldResource = Bukkit.getWorld(Config.Setting.WORLD_NAME.getString());
                 teleport(player, worldResource);
-            } else if (args.length == 2) {
-
-                switch (args[1]) {
-                    case "nether":
-
-                    if (!player.hasPermission("rw.tp.nether")) {
-                        player.sendMessage(MsgType.NO_PERMISSION.getMessage());
-                        return;
-                    }
-                    
-                    if (WorldUtils.netherExists() || !resettingNether) {
-                        World worldNether = Bukkit.getWorld(Config.Setting.NETHER_NAME.getString());
-                        teleport(player, worldNether);
-                    } else {
-                        player.sendMessage(MsgType.NOT_EXIST.getMessage());
-                    }
-                    
-                    case "end":
-                    if (!player.hasPermission("rw.tp.end")) {
-                        player.sendMessage(MsgType.NO_PERMISSION.getMessage());
-                        return;
-                    }
-                    if (WorldUtils.endExists() || !resettingEnd) {
-                        World worldEnd = Bukkit.getWorld(Config.Setting.END_NAME.getString());
-                        teleport(player, worldEnd);
-                    } else {
-                        player.sendMessage(MsgType.NOT_EXIST.getMessage());
-                    }
-                    case "overworld":
-                    if (!WorldUtils.worldExists() || resettingWorld) {
-                        player.sendMessage(MsgType.NOT_EXIST.getMessage());
-                        return;
-                    }
-                    World worldResource = Bukkit.getWorld(Config.Setting.WORLD_NAME.getString());
-                    teleport(player, worldResource);
+            } else if (args.length == 2 && args[1].equalsIgnoreCase("nether")) {
+                if (!player.hasPermission("rw.tp.nether")) {
+                    player.sendMessage(MsgType.NO_PERMISSION.getMessage());
+                    return;
+                }
+                if (WorldUtils.netherExists() || !resettingNether) {
+                    World worldNether = Bukkit.getWorld(Config.Setting.NETHER_NAME.getString());
+                    teleport(player, worldNether);
+                } else {
+                    player.sendMessage(MsgType.NOT_EXIST.getMessage());
+                }
+            } else if (args.length == 2 && args[1].equalsIgnoreCase("end")) {
+                if (!player.hasPermission("rw.tp.end")) {
+                    player.sendMessage(MsgType.NO_PERMISSION.getMessage());
+                    return;
+                }
+                if (WorldUtils.endExists() || !resettingEnd) {
+                    World worldEnd = Bukkit.getWorld(Config.Setting.END_NAME.getString());
+                    teleport(player, worldEnd);
+                } else {
+                    player.sendMessage(MsgType.NOT_EXIST.getMessage());
                 }
             }
         } else {
