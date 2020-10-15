@@ -79,3 +79,4 @@ bin/src/main/java/me/nik/resourceworld/utils/WorldGeneratorNether.class
 bin/src/main/java/me/nik/resourceworld/utils/WorldUtils.class
 bin/src/main/resources/plugin.yml
 .gitignore
+ResourceWorld.jar
