@@ -34,6 +34,7 @@ import me.nik.resourceworld.tasks.ResetNetherWorld;
 import me.nik.resourceworld.tasks.ResetWorld;
 import me.nik.resourceworld.utils.Messenger;
 import net.milkbowl.vault.economy.Economy;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
 import org.bukkit.World;
@@ -43,6 +44,8 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.earth2me.essentials.IEssentials;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,6 +58,7 @@ public final class ResourceWorld extends JavaPlugin {
     private Config config;
     private Data data;
     private Lang lang;
+    public static IEssentials ess;
 
     public static ResourceWorld getInstance() {
         return plugin;
@@ -127,6 +131,10 @@ public final class ResourceWorld extends JavaPlugin {
         }
 
         new MetricsLite(this, 6981);
+        
+		IEssentials ess = (IEssentials) this.getServer().getPluginManager().getPlugin("Essentials");
+		ResourceWorld.ess = ess;
+        
     }
 
     private void initWorlds() {
