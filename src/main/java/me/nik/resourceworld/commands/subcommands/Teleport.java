@@ -91,7 +91,7 @@ public class Teleport extends SubCommand {
                 switch (args[1].toLowerCase()) {
                 	case "overworld":
                 		ResourceWorld.ess.getUser(player).setLastLocation();
-                		teleport(player, Bukkit.getWorld(Config.Setting.NETHER_NAME.getString()));
+                		teleport(player, Bukkit.getWorld(Config.Setting.WORLD_NAME.getString()));
                     break;
                     case "nether":
                         if (!player.hasPermission(Permissions.TELEPORT_NETHER.getPermission())) {
