@@ -11,6 +11,8 @@ public class Data {
     private File file;
     private FileConfiguration data;
 
+    //TODO: Make values cached to improve perfomance, Or transfer these into my new config system
+
     public void setup(JavaPlugin plugin) {
         file = new File(plugin.getDataFolder(), "data.yml");
         if (!file.exists()) {

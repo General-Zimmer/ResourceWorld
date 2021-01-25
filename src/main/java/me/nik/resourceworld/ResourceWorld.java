@@ -263,9 +263,9 @@ public final class ResourceWorld extends JavaPlugin {
 
     private long worldTimer() {
         if (!Config.Setting.WORLD_STORE_TIME.getBoolean()) {
-            return Config.Setting.WORLD_RESETS_INTERVAL.getInt() * 72000;
+            return Config.Setting.WORLD_RESETS_INTERVAL.getInt() * 72000L;
         } else if (data.get().getLong("world.timer") <= 0) {
-            return Config.Setting.WORLD_RESETS_INTERVAL.getInt() * 72000;
+            return Config.Setting.WORLD_RESETS_INTERVAL.getInt() * 72000L;
         } else {
             return data.get().getLong("world.timer");
         }
@@ -273,9 +273,9 @@ public final class ResourceWorld extends JavaPlugin {
 
     private long netherTimer() {
         if (!Config.Setting.NETHER_STORE_TIME.getBoolean()) {
-            return Config.Setting.NETHER_RESETS_INTERVAL.getInt() * 72000;
+            return Config.Setting.NETHER_RESETS_INTERVAL.getInt() * 72000L;
         } else if (data.get().getLong("nether.timer") <= 0) {
-            return Config.Setting.NETHER_RESETS_INTERVAL.getInt() * 72000;
+            return Config.Setting.NETHER_RESETS_INTERVAL.getInt() * 72000L;
         } else {
             return data.get().getLong("nether.timer");
         }
@@ -283,9 +283,9 @@ public final class ResourceWorld extends JavaPlugin {
 
     private long endTimer() {
         if (!Config.Setting.END_STORE_TIME.getBoolean()) {
-            return Config.Setting.END_RESETS_INTERVAL.getInt() * 72000;
+            return Config.Setting.END_RESETS_INTERVAL.getInt() * 72000L;
         } else if (data.get().getLong("end.timer") <= 0) {
-            return Config.Setting.END_RESETS_INTERVAL.getInt() * 72000;
+            return Config.Setting.END_RESETS_INTERVAL.getInt() * 72000L;
         } else {
             return data.get().getLong("end.timer");
         }
@@ -336,7 +336,7 @@ public final class ResourceWorld extends JavaPlugin {
             pm.registerEvents(new CommandsNether(), this);
         }
         if (Config.Setting.SETTINGS_TELEPORT_TO_SPAWN.getBoolean()) {
-            pm.registerEvents(new LeaveInWorld(), this);
+            pm.registerEvents(new LeaveInWorld(this), this);
         }
         if (Config.Setting.WORLD_DISABLE_EXPLOSIONS.getBoolean()) {
             pm.registerEvents(new Explosion(), this);

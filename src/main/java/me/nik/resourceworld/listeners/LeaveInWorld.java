@@ -1,6 +1,8 @@
 package me.nik.resourceworld.listeners;
 
+import me.nik.resourceworld.ResourceWorld;
 import me.nik.resourceworld.files.Config;
+import me.nik.resourceworld.managers.custom.CustomWorld;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -11,20 +13,27 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class LeaveInWorld implements Listener {
 
-    @EventHandler(priority = EventPriority.LOW)
-    public void onLeave(PlayerQuitEvent e) {
-        final Player p = e.getPlayer();
-        if (isInWorld(p)) {
-            Location loc = Bukkit.getWorld(Config.Setting.SETTINGS_SPAWN_WORLD.getString()).getSpawnLocation();
-            p.teleport(loc);
-        }
+    private final ResourceWorld plugin;
+
+    public LeaveInWorld(ResourceWorld plugin) {
+        this.plugin = plugin;
     }
 
-    private boolean isInWorld(Player player) {
-        if (player.getWorld().getName().equalsIgnoreCase(Config.Setting.WORLD_NAME.getString())) {
-            return true;
-        } else if (player.getWorld().getName().equalsIgnoreCase(Config.Setting.NETHER_NAME.getString())) {
-            return true;
-        } else return player.getWorld().getName().equalsIgnoreCase(Config.Setting.END_NAME.getString());
+    @EventHandler(priority = EventPriority.LOW)
+    public void onLeave(PlayerQuitEvent e) {
+
+        final Player p = e.getPlayer();
+
+        final String world = p.getWorld().getName();
+
+        for (CustomWorld rw : this.plugin.getResourceWorlds().values()) {
+            if (!rw.getName().equals(world)) continue;
+
+            Location loc = Bukkit.getWorld(Config.Setting.SETTINGS_SPAWN_WORLD.getString()).getSpawnLocation();
+
+            if (loc != null) {
+                p.teleport(loc);
+            }
+        }
     }
 }
