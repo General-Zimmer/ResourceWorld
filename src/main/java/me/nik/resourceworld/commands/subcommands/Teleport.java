@@ -90,7 +90,7 @@ public class Teleport extends SubCommand {
             case 2:
                 switch (args[1].toLowerCase()) {
                 	case "overworld":
-                		ResourceWorld.ess.getUser(player).setLastLocation();
+                		ResourceWorld.getEss().getUser(player).setLastLocation();
                 		teleport(player, Bukkit.getWorld(Config.Setting.WORLD_NAME.getString()));
                     break;
                     case "nether":
@@ -98,7 +98,7 @@ public class Teleport extends SubCommand {
                             player.sendMessage(MsgType.NO_PERMISSION.getMessage());
                             return;
                         }
-                        ResourceWorld.ess.getUser(player).setLastLocation();
+                        ResourceWorld.getEss().getUser(player).setLastLocation();
                         teleport(player, Bukkit.getWorld(Config.Setting.NETHER_NAME.getString()));
                         break;
                     case "end":
@@ -106,7 +106,7 @@ public class Teleport extends SubCommand {
                             player.sendMessage(MsgType.NO_PERMISSION.getMessage());
                             return;
                         }
-                        ResourceWorld.ess.getUser(player).setLastLocation();
+                        ResourceWorld.getEss().getUser(player).setLastLocation();
                         teleport(player, Bukkit.getWorld(Config.Setting.END_NAME.getString()));
                         break;
                 }

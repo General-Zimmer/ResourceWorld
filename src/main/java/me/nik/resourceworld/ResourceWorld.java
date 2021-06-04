@@ -1,5 +1,6 @@
 package me.nik.resourceworld;
 
+import com.earth2me.essentials.IEssentials;
 import me.nik.resourceworld.commands.CommandManager;
 import me.nik.resourceworld.files.Config;
 import me.nik.resourceworld.files.Data;
@@ -35,10 +36,7 @@ import me.nik.resourceworld.tasks.ResetNetherWorld;
 import me.nik.resourceworld.tasks.ResetWorld;
 import me.nik.resourceworld.utils.Messenger;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.ChatColor;
-import org.bukkit.Difficulty;
-import org.bukkit.World;
-import org.bukkit.WorldType;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.PluginManager;
@@ -59,9 +57,11 @@ public final class ResourceWorld extends JavaPlugin {
     private Data data;
     private Lang lang;
 
+    private static IEssentials ess;
     public static ResourceWorld getInstance() {
         return plugin;
     }
+
 
     private final String[] STARTUP_MESSAGE = {
             " ",
@@ -129,6 +129,11 @@ public final class ResourceWorld extends JavaPlugin {
         startIntervals();
 
         initializeTasks();
+
+        RegisteredServiceProvider<com.earth2me.essentials.IEssentials> essvider = Bukkit.getServicesManager().getRegistration(com.earth2me.essentials.IEssentials.class);
+        if (essvider != null) {
+            ResourceWorld.ess = essvider.getProvider();
+        }
 
         if (this.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new PapiHook(this).register();
@@ -352,5 +357,8 @@ public final class ResourceWorld extends JavaPlugin {
             int interval = Config.Setting.END_RESETS_INTERVAL.getInt() * 72000;
             new ResetEndWorld(this).runTaskTimer(this, endTimer(), interval);
         }
+    }
+    public static IEssentials getEss() {
+        return ess;
     }
 }
