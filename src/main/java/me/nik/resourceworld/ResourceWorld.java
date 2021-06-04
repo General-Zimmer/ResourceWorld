@@ -5,36 +5,36 @@ import me.nik.resourceworld.files.Config;
 import me.nik.resourceworld.files.Data;
 import me.nik.resourceworld.files.Lang;
 import me.nik.resourceworld.files.commentedfiles.CommentedFileConfiguration;
-import me.nik.resourceworld.listeners.Drowning;
-import me.nik.resourceworld.listeners.GuiListener;
-import me.nik.resourceworld.listeners.LeaveInWorld;
-import me.nik.resourceworld.listeners.disabledcommands.CommandsEnd;
-import me.nik.resourceworld.listeners.disabledcommands.CommandsNether;
-import me.nik.resourceworld.listeners.disabledcommands.CommandsWorld;
-import me.nik.resourceworld.listeners.entityspawning.EntitySpawning;
-import me.nik.resourceworld.listeners.entityspawning.EntitySpawningEnd;
-import me.nik.resourceworld.listeners.entityspawning.EntitySpawningNether;
-import me.nik.resourceworld.listeners.explosion.Explosion;
-import me.nik.resourceworld.listeners.explosion.ExplosionEnd;
-import me.nik.resourceworld.listeners.explosion.ExplosionNether;
-import me.nik.resourceworld.listeners.portals.PortalEnd;
-import me.nik.resourceworld.listeners.portals.PortalNether;
-import me.nik.resourceworld.listeners.suffocation.Suffocation;
-import me.nik.resourceworld.listeners.suffocation.SuffocationEnd;
-import me.nik.resourceworld.listeners.suffocation.SuffocationNether;
+import me.nik.resourceworld.gui.GuiListener;
 import me.nik.resourceworld.managers.MsgType;
 import me.nik.resourceworld.managers.PapiHook;
 import me.nik.resourceworld.managers.UpdateChecker;
 import me.nik.resourceworld.managers.custom.CustomWorld;
 import me.nik.resourceworld.managers.custom.ResourceWorldType;
 import me.nik.resourceworld.metrics.MetricsLite;
+import me.nik.resourceworld.modules.ListenerModule;
+import me.nik.resourceworld.modules.impl.Drowning;
+import me.nik.resourceworld.modules.impl.LeaveWorld;
+import me.nik.resourceworld.modules.impl.disabledcommands.CommandsEnd;
+import me.nik.resourceworld.modules.impl.disabledcommands.CommandsNether;
+import me.nik.resourceworld.modules.impl.disabledcommands.CommandsWorld;
+import me.nik.resourceworld.modules.impl.entityspawning.EntitySpawning;
+import me.nik.resourceworld.modules.impl.entityspawning.EntitySpawningEnd;
+import me.nik.resourceworld.modules.impl.entityspawning.EntitySpawningNether;
+import me.nik.resourceworld.modules.impl.explosion.Explosion;
+import me.nik.resourceworld.modules.impl.explosion.ExplosionEnd;
+import me.nik.resourceworld.modules.impl.explosion.ExplosionNether;
+import me.nik.resourceworld.modules.impl.portals.PortalEnd;
+import me.nik.resourceworld.modules.impl.portals.PortalNether;
+import me.nik.resourceworld.modules.impl.suffocation.Suffocation;
+import me.nik.resourceworld.modules.impl.suffocation.SuffocationEnd;
+import me.nik.resourceworld.modules.impl.suffocation.SuffocationNether;
 import me.nik.resourceworld.tasks.AlwaysDay;
 import me.nik.resourceworld.tasks.ResetEndWorld;
 import me.nik.resourceworld.tasks.ResetNetherWorld;
 import me.nik.resourceworld.tasks.ResetWorld;
 import me.nik.resourceworld.utils.Messenger;
 import net.milkbowl.vault.economy.Economy;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
 import org.bukkit.World;
@@ -45,9 +45,9 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.earth2me.essentials.IEssentials;
-
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class ResourceWorld extends JavaPlugin {
@@ -58,7 +58,6 @@ public final class ResourceWorld extends JavaPlugin {
     private Config config;
     private Data data;
     private Lang lang;
-    public static IEssentials ess;
 
     public static ResourceWorld getInstance() {
         return plugin;
@@ -74,8 +73,13 @@ public final class ResourceWorld extends JavaPlugin {
 
     private final Map<ResourceWorldType, CustomWorld> resourceWorlds = new HashMap<>();
 
+    private final List<ListenerModule> modules = new ArrayList<>();
+
     @Override
     public void onDisable() {
+
+        //DisInitialize modules
+        this.modules.forEach(ListenerModule::disInit);
 
         //Store Time Left
         storeTimeLeft();
@@ -131,57 +135,59 @@ public final class ResourceWorld extends JavaPlugin {
         }
 
         new MetricsLite(this, 6981);
-        
-		IEssentials ess = (IEssentials) this.getServer().getPluginManager().getPlugin("Essentials");
-		ResourceWorld.ess = ess;
-        
     }
 
     private void initWorlds() {
         this.resourceWorlds.clear();
 
         if (Config.Setting.WORLD_ENABLED.getBoolean()) {
-            this.resourceWorlds.put(ResourceWorldType.RESOURCE_WORLD, new CustomWorld(Config.Setting.WORLD_NAME.getString(),
-                    Difficulty.valueOf(Config.Setting.WORLD_DIFFICULTY.getString()),
-                    WorldType.valueOf(Config.Setting.WORLD_TYPE.getString()),
-                    World.Environment.valueOf(Config.Setting.WORLD_ENVIRONMENT.getString()),
-                    Config.Setting.WORLD_GENERATE_STRUCTURES.getBoolean(),
-                    Config.Setting.WORLD_SEED_ENABLED.getBoolean(),
-                    Config.Setting.WORLD_SEED.getLong(),
-                    Config.Setting.WORLD_BORDER_ENABLED.getBoolean(),
-                    Config.Setting.WORLD_BORDER_SIZE.getInt(),
-                    Config.Setting.WORLD_PVP.getBoolean(),
-                    Config.Setting.WORLD_KEEP_INVENTORY.getBoolean(),
+            this.resourceWorlds.put(
+                    ResourceWorldType.RESOURCE_WORLD,
+                    new CustomWorld(Config.Setting.WORLD_NAME.getString(),
+                            Difficulty.valueOf(Config.Setting.WORLD_DIFFICULTY.getString()),
+                            WorldType.valueOf(Config.Setting.WORLD_TYPE.getString()),
+                            World.Environment.valueOf(Config.Setting.WORLD_ENVIRONMENT.getString()),
+                            Config.Setting.WORLD_GENERATE_STRUCTURES.getBoolean(),
+                            Config.Setting.WORLD_SEED_ENABLED.getBoolean(),
+                            Config.Setting.WORLD_SEED.getLong(),
+                            Config.Setting.WORLD_BORDER_ENABLED.getBoolean(),
+                            Config.Setting.WORLD_BORDER_SIZE.getInt(),
+                            Config.Setting.WORLD_PVP.getBoolean(),
+                            Config.Setting.WORLD_KEEP_INVENTORY.getBoolean(),
                     ResourceWorldType.RESOURCE_WORLD));
         }
 
         if (Config.Setting.NETHER_ENABLED.getBoolean()) {
-            this.resourceWorlds.put(ResourceWorldType.RESOURCE_NETHER, new CustomWorld(Config.Setting.NETHER_NAME.getString(),
-                    Difficulty.valueOf(Config.Setting.NETHER_DIFFICULTY.getString()),
-                    WorldType.valueOf(Config.Setting.NETHER_TYPE.getString()),
-                    World.Environment.valueOf(Config.Setting.NETHER_ENVIRONMENT.getString()),
-                    Config.Setting.NETHER_GENERATE_STRUCTURES.getBoolean(),
-                    Config.Setting.NETHER_SEED_ENABLED.getBoolean(),
-                    Config.Setting.NETHER_SEED.getLong(),
-                    Config.Setting.NETHER_BORDER_ENABLED.getBoolean(),
-                    Config.Setting.NETHER_BORDER_SIZE.getInt(),
-                    Config.Setting.NETHER_PVP.getBoolean(),
-                    Config.Setting.NETHER_KEEP_INVENTORY.getBoolean(),
+            this.resourceWorlds.put(
+                    ResourceWorldType.RESOURCE_NETHER,
+                    new CustomWorld(Config.Setting.NETHER_NAME.getString(),
+                            Difficulty.valueOf(Config.Setting.NETHER_DIFFICULTY.getString()),
+                            WorldType.valueOf(Config.Setting.NETHER_TYPE.getString()),
+                            World.Environment.valueOf(Config.Setting.NETHER_ENVIRONMENT.getString()),
+                            Config.Setting.NETHER_GENERATE_STRUCTURES.getBoolean(),
+                            Config.Setting.NETHER_SEED_ENABLED.getBoolean(),
+                            Config.Setting.NETHER_SEED.getLong(),
+                            Config.Setting.NETHER_BORDER_ENABLED.getBoolean(),
+                            Config.Setting.NETHER_BORDER_SIZE.getInt(),
+                            Config.Setting.NETHER_PVP.getBoolean(),
+                            Config.Setting.NETHER_KEEP_INVENTORY.getBoolean(),
                     ResourceWorldType.RESOURCE_NETHER));
         }
 
         if (Config.Setting.END_ENABLED.getBoolean()) {
-            this.resourceWorlds.put(ResourceWorldType.RESOURCE_END, new CustomWorld(Config.Setting.END_NAME.getString(),
-                    Difficulty.valueOf(Config.Setting.END_DIFFICULTY.getString()),
-                    WorldType.valueOf(Config.Setting.END_TYPE.getString()),
-                    World.Environment.valueOf(Config.Setting.END_ENVIRONMENT.getString()),
-                    Config.Setting.END_GENERATE_STRUCTURES.getBoolean(),
-                    Config.Setting.END_SEED_ENABLED.getBoolean(),
-                    Config.Setting.END_SEED.getLong(),
-                    Config.Setting.END_BORDER_ENABLED.getBoolean(),
-                    Config.Setting.END_BORDER_SIZE.getInt(),
-                    Config.Setting.END_PVP.getBoolean(),
-                    Config.Setting.END_KEEP_INVENTORY.getBoolean(),
+            this.resourceWorlds.put(
+                    ResourceWorldType.RESOURCE_END,
+                    new CustomWorld(Config.Setting.END_NAME.getString(),
+                            Difficulty.valueOf(Config.Setting.END_DIFFICULTY.getString()),
+                            WorldType.valueOf(Config.Setting.END_TYPE.getString()),
+                            World.Environment.valueOf(Config.Setting.END_ENVIRONMENT.getString()),
+                            Config.Setting.END_GENERATE_STRUCTURES.getBoolean(),
+                            Config.Setting.END_SEED_ENABLED.getBoolean(),
+                            Config.Setting.END_SEED.getLong(),
+                            Config.Setting.END_BORDER_ENABLED.getBoolean(),
+                            Config.Setting.END_BORDER_SIZE.getInt(),
+                            Config.Setting.END_PVP.getBoolean(),
+                            Config.Setting.END_KEEP_INVENTORY.getBoolean(),
                     ResourceWorldType.RESOURCE_END));
         }
 
@@ -308,54 +314,27 @@ public final class ResourceWorld extends JavaPlugin {
     private void initializeListeners() {
         final PluginManager pm = this.getServer().getPluginManager();
 
-        if (Config.Setting.WORLD_DISABLE_SUFFOCATION.getBoolean()) {
-            pm.registerEvents(new Suffocation(), this);
-        }
-        if (Config.Setting.NETHER_DISABLE_SUFFOCATION.getBoolean()) {
-            pm.registerEvents(new SuffocationNether(), this);
-        }
-        if (Config.Setting.END_DISABLE_SUFFOCATION.getBoolean()) {
-            pm.registerEvents(new SuffocationEnd(), this);
-        }
-        if (Config.Setting.WORLD_DISABLE_DROWNING.getBoolean()) {
-            pm.registerEvents(new Drowning(), this);
-        }
-        if (Config.Setting.WORLD_DISABLE_ENTITY_SPAWNING.getBoolean()) {
-            pm.registerEvents(new EntitySpawning(), this);
-        }
-        if (Config.Setting.WORLD_DISABLED_COMMANDS_ENABLED.getBoolean()) {
-            pm.registerEvents(new CommandsWorld(), this);
-        }
-        if (Config.Setting.NETHER_DISABLE_ENTITY_SPAWNING.getBoolean()) {
-            pm.registerEvents(new EntitySpawningNether(), this);
-        }
-        if (Config.Setting.END_DISABLE_ENTITY_SPAWNING.getBoolean()) {
-            pm.registerEvents(new EntitySpawningEnd(), this);
-        }
-        if (Config.Setting.NETHER_DISABLED_COMMANDS_ENABLED.getBoolean()) {
-            pm.registerEvents(new CommandsNether(), this);
-        }
-        if (Config.Setting.SETTINGS_TELEPORT_TO_SPAWN.getBoolean()) {
-            pm.registerEvents(new LeaveInWorld(this), this);
-        }
-        if (Config.Setting.WORLD_DISABLE_EXPLOSIONS.getBoolean()) {
-            pm.registerEvents(new Explosion(), this);
-        }
-        if (Config.Setting.END_DISABLED_COMMANDS_ENABLED.getBoolean()) {
-            pm.registerEvents(new CommandsEnd(), this);
-        }
-        if (Config.Setting.NETHER_DISABLE_EXPLOSIONS.getBoolean()) {
-            pm.registerEvents(new ExplosionNether(), this);
-        }
-        if (Config.Setting.END_DISABLE_EXPLOSIONS.getBoolean()) {
-            pm.registerEvents(new ExplosionEnd(), this);
-        }
-        if (Config.Setting.NETHER_PORTALS_ENABLED.getBoolean()) {
-            pm.registerEvents(new PortalNether(), this);
-        }
-        if (Config.Setting.END_PORTALS_ENABLED.getBoolean()) {
-            pm.registerEvents(new PortalEnd(), this);
-        }
+        //Load listener modules
+        this.modules.add(new LeaveWorld(this));
+        this.modules.add(new Drowning(this));
+        this.modules.add(new Suffocation(this));
+        this.modules.add(new SuffocationEnd(this));
+        this.modules.add(new SuffocationNether(this));
+        this.modules.add(new PortalEnd(this));
+        this.modules.add(new PortalNether(this));
+        this.modules.add(new Explosion(this));
+        this.modules.add(new ExplosionEnd(this));
+        this.modules.add(new ExplosionNether(this));
+        this.modules.add(new EntitySpawning(this));
+        this.modules.add(new EntitySpawningEnd(this));
+        this.modules.add(new EntitySpawningNether(this));
+        this.modules.add(new CommandsEnd(this));
+        this.modules.add(new CommandsNether(this));
+        this.modules.add(new CommandsWorld(this));
+
+        //Initialize them
+        this.modules.forEach(ListenerModule::init);
+
         //Don't be an idiot Nik, Always register this Listener
         pm.registerEvents(new GuiListener(), this);
     }
