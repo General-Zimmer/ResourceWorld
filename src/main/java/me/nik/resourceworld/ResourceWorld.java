@@ -34,6 +34,7 @@ import me.nik.resourceworld.tasks.ResetEndWorld;
 import me.nik.resourceworld.tasks.ResetNetherWorld;
 import me.nik.resourceworld.tasks.ResetWorld;
 import me.nik.resourceworld.utils.Messenger;
+import net.ess3.api.IEssentials;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
@@ -62,6 +63,7 @@ public final class ResourceWorld extends JavaPlugin {
     public static ResourceWorld getInstance() {
         return plugin;
     }
+    public static IEssentials ess;
 
     private final String[] STARTUP_MESSAGE = {
             " ",
